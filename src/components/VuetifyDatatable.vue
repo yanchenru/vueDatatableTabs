@@ -1,12 +1,12 @@
 <template>
   <div data-app>
     <v-toolbar flat color="white">
-      <v-toolbar-title>My CRUD</v-toolbar-title>
+      <v-toolbar-title>CHANNELS</v-toolbar-title>
       <v-divider class="mx-2" inset vertical></v-divider>
       <v-spacer></v-spacer>
       <v-dialog v-model="dialog" max-width="500px" max-height="500px">
         <template v-slot:activator="{ on }">
-          <v-btn color="primary" dark class="mb-2" v-on="on">New Item</v-btn>
+          <v-btn color="primary" dark class="mb-2" v-on="on">New Channel</v-btn>
         </template>
         <v-card>
           <v-card-title>
@@ -47,6 +47,7 @@
       :scalingDialog="scalingDialog"
       :editedScalingArray="editedScaling"
       v-on:closeDialog="closeScaling"
+      v-on:saveScaling="saveScaling"
     />
 
     <v-data-table :headers="headers" :items="cfgJsonData" class="elevation-1">
@@ -97,7 +98,6 @@ export default {
   },
   data: () => ({
     dialog: false,
-    scalingDialog: false,
     headers: [
       {
         text: "ch_id",
@@ -127,14 +127,15 @@ export default {
       carbs: 0,
       protein: 0
     },
-    editedScalingIndex: -1,
+    scalingDialog: false,
+    //editedScalingIndex: -1,
     editedScaling: [],
     cfgJsonData: []
   }),
 
   computed: {
     formTitle() {
-      return this.editedIndex === -1 ? "New Item" : "Edit Item";
+      return this.editedIndex === -1 ? "New Channel" : "Edit Channel";
     }
   },
 
@@ -166,22 +167,12 @@ export default {
         this.cfgJsonData.splice(index, 1);
     },
 
-    editScaling(scalings) {
-      //this.editedScalingIndex = this.cfgJsonData.indexOf(scaling);
-      this.editedScaling = scalings;
-      this.scalingDialog = true;
-    },
-
     close() {
       this.dialog = false;
       setTimeout(() => {
         this.editedItem = Object.assign({}, this.defaultItem);
         this.editedIndex = -1;
       }, 300);
-    },
-
-    closeScaling() {
-      this.scalingDialog = false;
     },
 
     save() {
@@ -191,6 +182,21 @@ export default {
         this.cfgJsonData.push(this.editedItem);
       }
       this.close();
+    },
+
+    editScaling(scalings) {
+      //this.editedScalingIndex = this.cfgJsonData.indexOf(scaling);
+      this.editedScaling = scalings;
+      this.scalingDialog = true;
+    },
+
+    closeScaling() {
+      this.scalingDialog = false;
+    },
+    
+    saveScaling(scalings) {
+      //this.editedScalingIndex = this.cfgJsonData.indexOf(scaling);
+      this.editedScaling = scalings;
     }
   }
 };

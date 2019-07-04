@@ -10,34 +10,37 @@
             <v-container grid-list-md>
               <v-layout wrap>
                 <v-flex xs12 sm6 md4>
-                  <v-text-field v-model="editedScalingArray[i].type" label="type"></v-text-field>
+                  <v-text-field v-model="scalings[i].type" label="type"></v-text-field>
                 </v-flex>
                 <v-flex xs12 sm6 md4>
-                  <v-text-field v-model="editedScalingArray[i]['avg.samples']" label="avg.samples"></v-text-field>
+                  <v-text-field v-model="scalings[i]['avg.samples']" label="avg.samples"></v-text-field>
                 </v-flex>
                 <v-flex xs12 sm6 md4>
-                  <v-text-field v-model="editedScalingArray[i]['itp.raw_low']" label="itp.raw_low"></v-text-field>
+                  <v-text-field v-model="scalings[i]['itp.raw_low']" label="itp.raw_low"></v-text-field>
                 </v-flex>
                 <v-flex xs12 sm6 md4>
-                  <v-text-field v-model="editedScalingArray[i]['itp.raw_high']" label="itp.raw_high"></v-text-field>
+                  <v-text-field v-model="scalings[i]['itp.raw_high']" label="itp.raw_high"></v-text-field>
                 </v-flex>
                 <v-flex xs12 sm6 md4>
-                  <v-text-field v-model="editedScalingArray[i]['itp.scaled_low']" label="itp.scaled_low"></v-text-field>
+                  <v-text-field v-model="scalings[i]['itp.scaled_low']" label="itp.scaled_low"></v-text-field>
                 </v-flex>
                 <v-flex xs12 sm6 md4>
-                  <v-text-field v-model="editedScalingArray[i]['itp.scaled_high']" label="itp.scaled_high"></v-text-field>
+                  <v-text-field v-model="scalings[i]['itp.scaled_high']" label="itp.scaled_high"></v-text-field>
                 </v-flex>
                 <v-flex xs12 sm6 md4>
-                  <v-text-field v-model="editedScalingArray[i]['itp.offset']" label="itp.offset"></v-text-field>
+                  <v-text-field v-model="scalings[i]['itp.offset']" label="itp.offset"></v-text-field>
                 </v-flex>
                 <v-flex xs12 sm6 md4>
-                  <v-text-field v-model="editedScalingArray[i]['kf.factor']" label="kf.factor"></v-text-field>
+                  <v-text-field v-model="scalings[i]['kf.factor']" label="kf.factor"></v-text-field>
                 </v-flex>
                 <v-flex xs12 sm6 md4>
-                  <v-text-field v-model="editedScalingArray[i]['kf.multiple']" label="kf.multiple"></v-text-field>
+                  <v-text-field v-model="scalings[i]['kf.multiple']" label="kf.multiple"></v-text-field>
                 </v-flex>
                 <v-flex xs12 sm6 md4>
-                  <v-text-field v-model="editedScalingArray[i]['ttl.samples_per_sec']" label="ttl.samples_per_sec"></v-text-field>
+                  <v-text-field
+                    v-model="scalings[i]['ttl.samples_per_sec']"
+                    label="ttl.samples_per_sec"
+                  ></v-text-field>
                 </v-flex>
               </v-layout>
             </v-container>
@@ -89,36 +92,41 @@ export default {
       //tab: null,
       tabCounter: 0,
       scalings: [],
-      editedScaling: {
-        name: "",
-        calories: 0,
-        fat: 0,
-        carbs: 0,
-        protein: 0
-      },
+      // editedScaling: {
+      //   name: "",
+      //   calories: 0,
+      //   fat: 0,
+      //   carbs: 0,
+      //   protein: 0
+      // },
       defaultScaling: {
         type: "INTERPOLATION",
-        calories: 0,
-        fat: 0,
-        carbs: 0,
-        protein: 0
+        "avg.samples": 0,
+        "itp.raw_low": 0,
+        "itp.raw_high": 1,
+        "itp.scaled_low": 0,
+        "itp.scaled_high": 1,
+        "itp.offset": 0,
+        "kf.factor": 0,
+        "kf.multiple": 0,
+        "ttl.samples_per_sec": 0
       },
-      editedIndex: -1
+      //editedIndex: -1,
+      savedScalingArray: []
     };
   },
 
-  computed: {
-  },
+  computed: {},
 
   watch: {
     scalingDialog(val) {
       this.dialog = val;
 
       if (val === true) {
-        this.scalings = this.editedScalingArray;
+        this.scalings = [...this.editedScalingArray];
 
         for (let i = 0; i < this.editedScalingArray.length; i++) {
-          this.newTab();
+          this.tabs.push(this.tabCounter++);
         }
       }
     },
@@ -141,8 +149,9 @@ export default {
       setTimeout(() => {
         this.tabs = [];
         this.tabCounter = 0;
-        this.editedItem = Object.assign({}, this.defaultItem);
-        this.editedIndex = -1;
+        this.savedScalingArray = [];
+        //this.editedItem = Object.assign({}, this.defaultItem);
+        //this.editedIndex = -1;
       }, 300);
 
       this.$emit("closeDialog", this.dialog);
@@ -151,11 +160,22 @@ export default {
     },
 
     save() {
-      if (this.editedIndex > -1) {
-        Object.assign(this.cfgJsonData[this.editedIndex], this.editedItem);
-      } else {
-        this.cfgJsonData.push(this.editedItem);
+      // if (this.editedIndex > -1) {
+      //   Object.assign(this.cfgJsonData[this.editedIndex], this.editedItem);
+      // } else {
+      //   this.cfgJsonData.push(this.editedItem);
+      // }
+
+      //this.test = this.scalings.filter(function(el, index){return this.tabs.indexOf(index) == -1});
+      
+      for (let i = 0; i < this.scalings.length; i++) {
+        if (this.tabs.includes(i)) {
+          this.savedScalingArray.push(this.scalings[i]);          
+        }
       }
+
+      this.$emit("saveScaling", this.savedScalingArray);
+
       this.close();
     },
 
@@ -163,11 +183,13 @@ export default {
       for (let i = 0; i < this.tabs.length; i++) {
         if (this.tabs[i] === x) {
           this.tabs.splice(i, 1);
+          //this.scalings.splice(i, 1);
         }
       }
     },
 
     newTab() {
+      this.scalings.push({...this.defaultScaling});
       this.tabs.push(this.tabCounter++);
     }
   }
