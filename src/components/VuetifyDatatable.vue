@@ -45,7 +45,7 @@
 
     <Scaling
       :scalingDialog="scalingDialog"
-      :editedScaling="editedScaling"
+      :editedScalingArray="editedScaling"
       v-on:closeDialog="closeScaling"
     />
 

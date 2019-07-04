@@ -5,80 +5,39 @@
         <span class="headline">Scalings</span>
       </v-card-title>
       <v-card-text>
-        <!-- <v-tabs v-model="tab" background-color="red lighten-2" dark>
-          <v-tab v-for="n in tabs" :key="n">Scaling {{ n }}</v-tab>
-          <v-tab-item v-for="n in tabs" :key="n">
+        <b-tabs card>
+          <b-tab v-for="i in tabs" :key="i" :title="`Scaling ${i}`">
             <v-container grid-list-md>
               <v-layout wrap>
                 <v-flex xs12 sm6 md4>
-                  <v-text-field v-model="editedItem.internal_name" label="type"></v-text-field>
+                  <v-text-field v-model="editedScalingArray[i].type" label="type"></v-text-field>
                 </v-flex>
                 <v-flex xs12 sm6 md4>
-                  <v-text-field v-model="editedItem.display_name" label="avg.samples"></v-text-field>
+                  <v-text-field v-model="editedScalingArray[i]['avg.samples']" label="avg.samples"></v-text-field>
                 </v-flex>
                 <v-flex xs12 sm6 md4>
-                  <v-text-field v-model="editedItem.precision" label="itp.raw_low"></v-text-field>
+                  <v-text-field v-model="editedScalingArray[i]['itp.raw_low']" label="itp.raw_low"></v-text-field>
                 </v-flex>
                 <v-flex xs12 sm6 md4>
-                  <v-text-field v-model="editedItem.carbs" label="itp.raw_high"></v-text-field>
+                  <v-text-field v-model="editedScalingArray[i]['itp.raw_high']" label="itp.raw_high"></v-text-field>
                 </v-flex>
                 <v-flex xs12 sm6 md4>
-                  <v-text-field v-model="editedItem.protein" label="itp.scaled_low"></v-text-field>
+                  <v-text-field v-model="editedScalingArray[i]['itp.scaled_low']" label="itp.scaled_low"></v-text-field>
                 </v-flex>
                 <v-flex xs12 sm6 md4>
-                  <v-text-field v-model="editedItem.internal_name" label="itp.scaled_high"></v-text-field>
+                  <v-text-field v-model="editedScalingArray[i]['itp.scaled_high']" label="itp.scaled_high"></v-text-field>
                 </v-flex>
                 <v-flex xs12 sm6 md4>
-                  <v-text-field v-model="editedItem.display_name" label="itp.offset"></v-text-field>
+                  <v-text-field v-model="editedScalingArray[i]['itp.offset']" label="itp.offset"></v-text-field>
                 </v-flex>
                 <v-flex xs12 sm6 md4>
-                  <v-text-field v-model="editedItem.precision" label="kf.factor"></v-text-field>
+                  <v-text-field v-model="editedScalingArray[i]['kf.factor']" label="kf.factor"></v-text-field>
                 </v-flex>
                 <v-flex xs12 sm6 md4>
-                  <v-text-field v-model="editedItem.carbs" label="kf.multiple"></v-text-field>
+                  <v-text-field v-model="editedScalingArray[i]['kf.multiple']" label="kf.multiple"></v-text-field>
                 </v-flex>
                 <v-flex xs12 sm6 md4>
-                  <v-text-field v-model="editedItem.protein" label="ttl.samples_per_sec"></v-text-field>
-                </v-flex>
-              </v-layout>
-            </v-container>
-          </v-tab-item>
-        </v-tabs>-->
-
-        <b-tabs card>
-          <!-- Render Tabs, supply a unique `key` to each tab -->
-          <b-tab v-for="i in tabs" :key="i" :title="`Scaling ${i}`">
-                        <v-container grid-list-md>
-              <v-layout wrap>
-                <v-flex xs12 sm6 md4>
-                  <v-text-field v-model="editedItem.internal_name" label="type"></v-text-field>
-                </v-flex>
-                <v-flex xs12 sm6 md4>
-                  <v-text-field v-model="editedItem.display_name" label="avg.samples"></v-text-field>
-                </v-flex>
-                <v-flex xs12 sm6 md4>
-                  <v-text-field v-model="editedItem.precision" label="itp.raw_low"></v-text-field>
-                </v-flex>
-                <v-flex xs12 sm6 md4>
-                  <v-text-field v-model="editedItem.carbs" label="itp.raw_high"></v-text-field>
-                </v-flex>
-                <v-flex xs12 sm6 md4>
-                  <v-text-field v-model="editedItem.protein" label="itp.scaled_low"></v-text-field>
-                </v-flex>
-                <v-flex xs12 sm6 md4>
-                  <v-text-field v-model="editedItem.internal_name" label="itp.scaled_high"></v-text-field>
-                </v-flex>
-                <v-flex xs12 sm6 md4>
-                  <v-text-field v-model="editedItem.display_name" label="itp.offset"></v-text-field>
-                </v-flex>
-                <v-flex xs12 sm6 md4>
-                  <v-text-field v-model="editedItem.precision" label="kf.factor"></v-text-field>
-                </v-flex>
-                <v-flex xs12 sm6 md4>
-                  <v-text-field v-model="editedItem.carbs" label="kf.multiple"></v-text-field>
-                </v-flex>
-                <v-flex xs12 sm6 md4>
-                  <v-text-field v-model="editedItem.protein" label="ttl.samples_per_sec"></v-text-field>
+                  <v-text-field v-model="editedScalingArray[i]['ttl.samples_per_sec']" label="ttl.samples_per_sec"></v-text-field>
                 </v-flex>
               </v-layout>
             </v-container>
@@ -120,7 +79,7 @@
 
 <script>
 export default {
-  props: ["scalingDialog", "editedScaling"],
+  props: ["scalingDialog", "editedScalingArray"],
 
   data() {
     return {
@@ -130,15 +89,15 @@ export default {
       //tab: null,
       tabCounter: 0,
       scalings: [],
-      editedItem: {
+      editedScaling: {
         name: "",
         calories: 0,
         fat: 0,
         carbs: 0,
         protein: 0
       },
-      defaultItem: {
-        name: "",
+      defaultScaling: {
+        type: "INTERPOLATION",
         calories: 0,
         fat: 0,
         carbs: 0,
@@ -149,22 +108,6 @@ export default {
   },
 
   computed: {
-    // tabs() {
-    //   var initTabs = [];
-    //   for (let i=0; i<this.length; i++){
-    //     initTabs[i]=i+1;
-    //   }
-    //   return initTabs;
-    // }
-    // formTitle() {
-    //   return this.editedIndex === -1 ? "New Item" : "Edit Item";
-    // },
-    //showDialog(){
-    //get: function() {
-    //return this.scalingDialog;
-    //   },
-    //   set: function() {}
-    //}
   },
 
   watch: {
@@ -172,9 +115,9 @@ export default {
       this.dialog = val;
 
       if (val === true) {
-        this.scalings = this.editedScaling;
+        this.scalings = this.editedScalingArray;
 
-        for (let i = 0; i < this.editedScaling.length; i++) {
+        for (let i = 0; i < this.editedScalingArray.length; i++) {
           this.newTab();
         }
       }
@@ -198,7 +141,6 @@ export default {
       setTimeout(() => {
         this.tabs = [];
         this.tabCounter = 0;
-        this.tab = null;
         this.editedItem = Object.assign({}, this.defaultItem);
         this.editedIndex = -1;
       }, 300);
@@ -218,9 +160,6 @@ export default {
     },
 
     closeTab(x) {
-      //this.tabs.pop();
-      //this.tab = this.tab+1;
-      //this.tab === 0 ? 0:this.tab-1;
       for (let i = 0; i < this.tabs.length; i++) {
         if (this.tabs[i] === x) {
           this.tabs.splice(i, 1);
