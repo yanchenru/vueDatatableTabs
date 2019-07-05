@@ -5,8 +5,9 @@
         <span class="headline">Scalings</span>
       </v-card-title>
       <v-card-text>
-        <b-tabs card>
+        <b-tabs v-if="scalings.length>0" card>
           <b-tab v-for="i in tabs" :key="i" :title="`Scaling ${i}`">
+            <b-button size="sm" class="float-right" @click="() => closeTab(i)">Close tab</b-button>
             <v-container grid-list-md>
               <v-layout wrap>
                 <v-flex xs12 sm6 md4>
@@ -44,16 +45,8 @@
                 </v-flex>
               </v-layout>
             </v-container>
-
-            <b-button
-              size="sm"
-              variant="danger"
-              class="float-right"
-              @click="() => closeTab(i)"
-            >Close tab</b-button>
           </b-tab>
 
-          <!-- New Tab Button (Using tabs slot) -->
           <template slot="tabs">
             <b-nav-item @click.prevent="newTab" href="#">
               <b>+</b>
@@ -72,8 +65,6 @@
       <v-card-actions>
         <v-spacer></v-spacer>
         <v-btn color="blue darken-1" flat @click="close">Cancel</v-btn>
-        <!-- <v-btn color="blue darken-1" flat @click="removeTab">Remove</v-btn>
-        <v-btn color="blue darken-1" flat @click="newTab">Add</v-btn>-->
         <v-btn color="blue darken-1" flat @click="save">Save</v-btn>
       </v-card-actions>
     </v-card>
@@ -87,18 +78,8 @@ export default {
   data() {
     return {
       dialog: this.scalingDialog,
-      //length: this.editedScaling.length,
       tabs: [],
-      //tab: null,
       tabCounter: 0,
-      scalings: [],
-      // editedScaling: {
-      //   name: "",
-      //   calories: 0,
-      //   fat: 0,
-      //   carbs: 0,
-      //   protein: 0
-      // },
       defaultScaling: {
         type: "INTERPOLATION",
         "avg.samples": 0,
@@ -111,7 +92,7 @@ export default {
         "kf.multiple": 0,
         "ttl.samples_per_sec": 0
       },
-      //editedIndex: -1,
+      scalings: [],
       savedScalingArray: []
     };
   },
@@ -121,57 +102,39 @@ export default {
   watch: {
     scalingDialog(val) {
       this.dialog = val;
-
-      if (val === true && this.editedScalingArray) {
-        this.scalings = [...this.editedScalingArray];
-
-        for (let i = 0; i < this.editedScalingArray.length; i++) {
-          this.tabs.push(this.tabCounter++);
-        }
-      }
     },
 
     dialog(val) {
       val || this.close();
-    }
-    // editedScaling(val) {
-    //   this.length = val.length;
-    //   this.scalings = val;
+    },
 
-    //   for (let i = 0; i < val.length; i++) {
-    //     this.tabs.push(this.tabCounter++);
-    //   }
-    // }
+    editedScalingArray(val) {
+      this.scalings = JSON.parse(JSON.stringify(val));
+
+      for (let i = 0; i < val.length; i++) {
+        this.tabs.push(this.tabCounter++);
+      }
+    }
   },
 
   methods: {
     close() {
-      //this.dialog = false;
+      this.dialog = false;
+
       setTimeout(() => {
         this.tabs = [];
         this.tabCounter = 0;
+        this.scalings = [];
         this.savedScalingArray = [];
-        //this.editedItem = Object.assign({}, this.defaultItem);
-        //this.editedIndex = -1;
       }, 300);
 
       this.$emit("closeDialog", this.dialog);
-
-      //this.editedScaling = []
     },
 
     save() {
-      // if (this.editedIndex > -1) {
-      //   Object.assign(this.cfgJsonData[this.editedIndex], this.editedItem);
-      // } else {
-      //   this.cfgJsonData.push(this.editedItem);
-      // }
-
-      //this.test = this.scalings.filter(function(el, index){return this.tabs.indexOf(index) == -1});
-      
       for (let i = 0; i < this.scalings.length; i++) {
         if (this.tabs.includes(i)) {
-          this.savedScalingArray.push(this.scalings[i]);          
+          this.savedScalingArray.push(this.scalings[i]);
         }
       }
 
@@ -184,13 +147,12 @@ export default {
       for (let i = 0; i < this.tabs.length; i++) {
         if (this.tabs[i] === x) {
           this.tabs.splice(i, 1);
-          //this.scalings.splice(i, 1);
         }
       }
     },
 
     newTab() {
-      this.scalings.push({...this.defaultScaling});
+      this.scalings.push({ ...this.defaultScaling });
       this.tabs.push(this.tabCounter++);
     }
   }

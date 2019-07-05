@@ -62,7 +62,7 @@
         <td class="text-xs-left">{{ props.item.unit }}</td>
         <td class="text-xs-left">{{ props.item.source_id }}</td>
         <td class="text-xs-left">
-          <v-icon small class="mr-2" @click="editScaling(props.item.scalings)">list</v-icon>
+          <v-icon small class="mr-2" @click="editScaling(props.item)">list</v-icon>
         </td>
         <td class="justify-center layout px-0">
           <v-icon small class="mr-2" @click="editChannel(props.item)">edit</v-icon>
@@ -104,7 +104,6 @@ export default {
     headers: [
       {
         text: "ch_id",
-        //align: "left",
         value: "name"
       },
       { text: "internal_name", value: "internal_name" },
@@ -115,8 +114,7 @@ export default {
       { text: "scalings", value: "scalings" },
       { text: "Actions", align: "center", value: "name", sortable: false }
     ],
-    editedIndex: -1,
-    editedItem: {},
+    editedChannelIndex: -1,
     editedChannel: {
       ch_id: 0,
       internal_name: "Slot-",
@@ -134,14 +132,13 @@ export default {
       source_id: 0
     },
     scalingDialog: false,
-    //editedScalingIndex: -1,
     editedScaling: [],
     channelsArray: []
   }),
 
   computed: {
     formTitle() {
-      return this.editedIndex === -1 ? "New Channel" : "Edit Channel";
+      return this.editedChannelIndex === -1 ? "New Channel" : "Edit Channel";
     },
 
     newChannelIndex() {
@@ -167,7 +164,7 @@ export default {
     },
 
     editChannel(item) {
-      this.editedIndex = this.channelsArray.indexOf(item);
+      this.editedChannelIndex = this.channelsArray.indexOf(item);
       this.editedChannel = Object.assign({}, item);
       this.dialog = true;
     },
@@ -184,31 +181,32 @@ export default {
       this.defaultChannel.source_id = this.newChannelIndex;
       setTimeout(() => {
         this.editedChannel = Object.assign({}, this.defaultChannel);
-        this.editedIndex = -1;
+        this.editedChannelIndex = -1;
       }, 300);
     },
 
     save() {
-      if (this.editedIndex > -1) {
-        Object.assign(this.channelsArray[this.editedIndex], this.editedChannel);
+      if (this.editedChannelIndex > -1) {
+        Object.assign(this.channelsArray[this.editedChannelIndex], this.editedChannel);
       } else {
         this.channelsArray.push(this.editedChannel);
       }
       this.close();
     },
 
-    editScaling(scalings) {
-      //this.editedScalingIndex = this.channelsArray.indexOf(scaling);
-      this.editedScaling = scalings;
+    editScaling(item) {
+      this.editedChannelIndex = this.channelsArray.indexOf(item);
+      this.editedScaling = item.scalings;
       this.scalingDialog = true;
     },
 
     closeScaling() {
       this.scalingDialog = false;
+      this.editedScaling = [];
     },
 
     saveScaling(scalings) {
-      //this.editedScalingIndex = this.channelsArray.indexOf(scaling);
+      this.channelsArray[this.editedChannelIndex].scalings = scalings;
       this.editedScaling = scalings;
     }
   }
