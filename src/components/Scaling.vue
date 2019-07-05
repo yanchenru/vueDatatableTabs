@@ -122,7 +122,7 @@ export default {
     scalingDialog(val) {
       this.dialog = val;
 
-      if (val === true) {
+      if (val === true && this.editedScalingArray) {
         this.scalings = [...this.editedScalingArray];
 
         for (let i = 0; i < this.editedScalingArray.length; i++) {
@@ -130,6 +130,7 @@ export default {
         }
       }
     },
+
     dialog(val) {
       val || this.close();
     }

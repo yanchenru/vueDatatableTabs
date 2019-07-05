@@ -4,7 +4,7 @@
       <v-toolbar-title>CHANNELS</v-toolbar-title>
       <v-divider class="mx-2" inset vertical></v-divider>
       <v-spacer></v-spacer>
-      <v-dialog v-model="dialog" max-width="500px" max-height="500px">
+      <v-dialog v-model="dialog" max-width="600px" max-height="500px">
         <template v-slot:activator="{ on }">
           <v-btn color="primary" dark class="mb-2" v-on="on">New Channel</v-btn>
         </template>
@@ -16,19 +16,22 @@
             <v-container grid-list-md>
               <v-layout wrap>
                 <v-flex xs12 sm6 md4>
-                  <v-text-field v-model="editedItem.internal_name" label="internal_name"></v-text-field>
+                  <v-text-field v-model="editedChannel.ch_id" label="ch_id"></v-text-field>
                 </v-flex>
                 <v-flex xs12 sm6 md4>
-                  <v-text-field v-model="editedItem.display_name" label="display_name"></v-text-field>
+                  <v-text-field v-model="editedChannel.internal_name" label="internal_name"></v-text-field>
                 </v-flex>
                 <v-flex xs12 sm6 md4>
-                  <v-text-field v-model="editedItem.precision" label="precision"></v-text-field>
+                  <v-text-field v-model="editedChannel.display_name" label="display_name"></v-text-field>
                 </v-flex>
                 <v-flex xs12 sm6 md4>
-                  <v-text-field v-model="editedItem.carbs" label="unit"></v-text-field>
+                  <v-text-field v-model="editedChannel.precision" label="precision"></v-text-field>
                 </v-flex>
                 <v-flex xs12 sm6 md4>
-                  <v-text-field v-model="editedItem.protein" label="source_id"></v-text-field>
+                  <v-text-field v-model="editedChannel.unit" label="unit"></v-text-field>
+                </v-flex>
+                <v-flex xs12 sm6 md4>
+                  <v-text-field v-model="editedChannel.source_id" label="source_id"></v-text-field>
                 </v-flex>
               </v-layout>
             </v-container>
@@ -50,7 +53,7 @@
       v-on:saveScaling="saveScaling"
     />
 
-    <v-data-table :headers="headers" :items="cfgJsonData" class="elevation-1">
+    <v-data-table :headers="headers" :items="channelsArray" class="elevation-1">
       <template v-slot:items="props">
         <td class="text-xs-left">{{ props.item.ch_id }}</td>
         <td class="text-xs-left">{{ props.item.internal_name }}</td>
@@ -62,8 +65,8 @@
           <v-icon small class="mr-2" @click="editScaling(props.item.scalings)">list</v-icon>
         </td>
         <td class="justify-center layout px-0">
-          <v-icon small class="mr-2" @click="editItem(props.item)">edit</v-icon>
-          <v-icon small @click="deleteItem(props.item)">delete</v-icon>
+          <v-icon small class="mr-2" @click="editChannel(props.item)">edit</v-icon>
+          <v-icon small @click="deleteChannel(props.item)">delete</v-icon>
         </td>
       </template>
       <template v-slot:no-data>
@@ -113,29 +116,36 @@ export default {
       { text: "Actions", align: "center", value: "name", sortable: false }
     ],
     editedIndex: -1,
-    editedItem: {
-      name: "",
-      calories: 0,
-      fat: 0,
-      carbs: 0,
-      protein: 0
+    editedItem: {},
+    editedChannel: {
+      ch_id: 0,
+      internal_name: "Slot-",
+      display_name: "Slot-",
+      precision: 2,
+      unit: "",
+      source_id: 0
     },
-    defaultItem: {
-      name: "",
-      calories: 0,
-      fat: 0,
-      carbs: 0,
-      protein: 0
+    defaultChannel: {
+      ch_id: 0,
+      internal_name: "Slot-",
+      display_name: "Slot-",
+      precision: 2,
+      unit: "",
+      source_id: 0
     },
     scalingDialog: false,
     //editedScalingIndex: -1,
     editedScaling: [],
-    cfgJsonData: []
+    channelsArray: []
   }),
 
   computed: {
     formTitle() {
       return this.editedIndex === -1 ? "New Channel" : "Edit Channel";
+    },
+
+    newChannelIndex() {
+      return this.channelsArray.length;
     }
   },
 
@@ -151,41 +161,44 @@ export default {
 
   methods: {
     initialize() {
-      this.cfgJsonData = cfgJson.data.channels;
-      //this.cfgJsonData = cfgJson;
+      this.channelsArray = cfgJson.data.channels;
+      this.editedChannel.ch_id = this.newChannelIndex;
+      this.editedChannel.source_id = this.newChannelIndex;
     },
 
-    editItem(item) {
-      this.editedIndex = this.cfgJsonData.indexOf(item);
-      this.editedItem = Object.assign({}, item);
+    editChannel(item) {
+      this.editedIndex = this.channelsArray.indexOf(item);
+      this.editedChannel = Object.assign({}, item);
       this.dialog = true;
     },
 
-    deleteItem(item) {
-      const index = this.cfgJsonData.indexOf(item);
+    deleteChannel(item) {
+      const index = this.channelsArray.indexOf(item);
       confirm("Are you sure you want to delete this item?") &&
-        this.cfgJsonData.splice(index, 1);
+        this.channelsArray.splice(index, 1);
     },
 
     close() {
       this.dialog = false;
+      this.defaultChannel.ch_id = this.newChannelIndex;
+      this.defaultChannel.source_id = this.newChannelIndex;
       setTimeout(() => {
-        this.editedItem = Object.assign({}, this.defaultItem);
+        this.editedChannel = Object.assign({}, this.defaultChannel);
         this.editedIndex = -1;
       }, 300);
     },
 
     save() {
       if (this.editedIndex > -1) {
-        Object.assign(this.cfgJsonData[this.editedIndex], this.editedItem);
+        Object.assign(this.channelsArray[this.editedIndex], this.editedChannel);
       } else {
-        this.cfgJsonData.push(this.editedItem);
+        this.channelsArray.push(this.editedChannel);
       }
       this.close();
     },
 
     editScaling(scalings) {
-      //this.editedScalingIndex = this.cfgJsonData.indexOf(scaling);
+      //this.editedScalingIndex = this.channelsArray.indexOf(scaling);
       this.editedScaling = scalings;
       this.scalingDialog = true;
     },
@@ -193,9 +206,9 @@ export default {
     closeScaling() {
       this.scalingDialog = false;
     },
-    
+
     saveScaling(scalings) {
-      //this.editedScalingIndex = this.cfgJsonData.indexOf(scaling);
+      //this.editedScalingIndex = this.channelsArray.indexOf(scaling);
       this.editedScaling = scalings;
     }
   }
