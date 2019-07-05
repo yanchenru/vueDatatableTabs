@@ -5,37 +5,70 @@
         <span class="headline">Scalings</span>
       </v-card-title>
       <v-card-text>
-        <b-tabs v-if="scalings.length>0" card>
+        <!-- <b-tabs v-if="scalings.length>0" card> -->
+        <b-tabs card>
           <b-tab v-for="i in tabs" :key="i" :title="`Scaling ${i}`">
             <b-button size="sm" class="float-right" @click="() => closeTab(i)">Close tab</b-button>
             <v-container grid-list-md>
-              <v-layout wrap>
+              <v-layout v-if="scalings.length>0" wrap>
                 <v-flex xs12 sm6 md4>
-                  <v-text-field v-model="scalings[i].type" label="type"></v-text-field>
+                  <v-text-field v-model="scalings[i].type" label="type" :rules="[rules.required]"></v-text-field>
                 </v-flex>
                 <v-flex xs12 sm6 md4>
-                  <v-text-field v-model="scalings[i]['avg.samples']" label="avg.samples"></v-text-field>
+                  <v-text-field
+                    v-model="scalings[i]['avg.samples']"
+                    label="avg.samples"
+                    :rules="[rules.required]"
+                  ></v-text-field>
                 </v-flex>
                 <v-flex xs12 sm6 md4>
-                  <v-text-field v-model="scalings[i]['itp.raw_low']" label="itp.raw_low"></v-text-field>
+                  <v-text-field
+                    v-model="scalings[i]['itp.raw_low']"
+                    label="itp.raw_low"
+                    :rules="[rules.required]"
+                  ></v-text-field>
                 </v-flex>
                 <v-flex xs12 sm6 md4>
-                  <v-text-field v-model="scalings[i]['itp.raw_high']" label="itp.raw_high"></v-text-field>
+                  <v-text-field
+                    v-model="scalings[i]['itp.raw_high']"
+                    label="itp.raw_high"
+                    :rules="[rules.required]"
+                  ></v-text-field>
                 </v-flex>
                 <v-flex xs12 sm6 md4>
-                  <v-text-field v-model="scalings[i]['itp.scaled_low']" label="itp.scaled_low"></v-text-field>
+                  <v-text-field
+                    v-model="scalings[i]['itp.scaled_low']"
+                    label="itp.scaled_low"
+                    :rules="[rules.required]"
+                  ></v-text-field>
                 </v-flex>
                 <v-flex xs12 sm6 md4>
-                  <v-text-field v-model="scalings[i]['itp.scaled_high']" label="itp.scaled_high"></v-text-field>
+                  <v-text-field
+                    v-model="scalings[i]['itp.scaled_high']"
+                    label="itp.scaled_high"
+                    :rules="[rules.required]"
+                  ></v-text-field>
                 </v-flex>
                 <v-flex xs12 sm6 md4>
-                  <v-text-field v-model="scalings[i]['itp.offset']" label="itp.offset"></v-text-field>
+                  <v-text-field
+                    v-model="scalings[i]['itp.offset']"
+                    label="itp.offset"
+                    :rules="[rules.required]"
+                  ></v-text-field>
                 </v-flex>
                 <v-flex xs12 sm6 md4>
-                  <v-text-field v-model="scalings[i]['kf.factor']" label="kf.factor"></v-text-field>
+                  <v-text-field
+                    v-model="scalings[i]['kf.factor']"
+                    label="kf.factor"
+                    :rules="[rules.required]"
+                  ></v-text-field>
                 </v-flex>
                 <v-flex xs12 sm6 md4>
-                  <v-text-field v-model="scalings[i]['kf.multiple']" label="kf.multiple"></v-text-field>
+                  <v-text-field
+                    v-model="scalings[i]['kf.multiple']"
+                    label="kf.multiple"
+                    :rules="[rules.required]"
+                  ></v-text-field>
                 </v-flex>
                 <v-flex xs12 sm6 md4>
                   <v-text-field
@@ -77,6 +110,10 @@ export default {
 
   data() {
     return {
+      rules: {
+        required: value => !!value || "Required."
+        //positiveNumber: value => value > 0 || "Greater than 0"
+      },
       dialog: this.scalingDialog,
       tabs: [],
       tabCounter: 0,

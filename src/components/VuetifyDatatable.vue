@@ -8,7 +8,7 @@
         <template v-slot:activator="{ on }">
           <v-btn color="primary" dark class="mb-2" v-on="on">New Channel</v-btn>
         </template>
-        <v-card>
+        <v-card ref="form">
           <v-card-title>
             <span class="headline">{{ formTitle }}</span>
           </v-card-title>
@@ -16,22 +16,42 @@
             <v-container grid-list-md>
               <v-layout wrap>
                 <v-flex xs12 sm6 md4>
-                  <v-text-field v-model="editedChannel.ch_id" label="ch_id"></v-text-field>
+                  <v-text-field
+                    v-model="editedChannel.ch_id"
+                    label="ch_id"
+                    :rules="[rules.required]"
+                  ></v-text-field>
                 </v-flex>
                 <v-flex xs12 sm6 md4>
-                  <v-text-field v-model="editedChannel.internal_name" label="internal_name"></v-text-field>
+                  <v-text-field
+                    v-model="editedChannel.internal_name"
+                    label="internal_name"
+                    :rules="[rules.required]"
+                  ></v-text-field>
                 </v-flex>
                 <v-flex xs12 sm6 md4>
-                  <v-text-field v-model="editedChannel.display_name" label="display_name"></v-text-field>
+                  <v-text-field
+                    v-model="editedChannel.display_name"
+                    label="display_name"
+                    :rules="[rules.required]"
+                  ></v-text-field>
                 </v-flex>
                 <v-flex xs12 sm6 md4>
-                  <v-text-field v-model="editedChannel.precision" label="precision"></v-text-field>
+                  <v-text-field
+                    v-model="editedChannel.precision"
+                    label="precision"
+                    :rules="[rules.required, rules.positiveNumber]"
+                  ></v-text-field>
                 </v-flex>
                 <v-flex xs12 sm6 md4>
                   <v-text-field v-model="editedChannel.unit" label="unit"></v-text-field>
                 </v-flex>
                 <v-flex xs12 sm6 md4>
-                  <v-text-field v-model="editedChannel.source_id" label="source_id"></v-text-field>
+                  <v-text-field
+                    v-model="editedChannel.source_id"
+                    label="source_id"
+                    :rules="[rules.required]"
+                  ></v-text-field>
                 </v-flex>
               </v-layout>
             </v-container>
@@ -99,42 +119,50 @@ export default {
   components: {
     Scaling
   },
-  data: () => ({
-    dialog: false,
-    headers: [
-      {
-        text: "ch_id",
-        value: "name"
+  data() {
+    return {
+      rules: {
+        required: value => !!value || "Required.",
+        positiveNumber: value => value > 0 || "Greater than 0"
       },
-      { text: "internal_name", value: "internal_name" },
-      { text: "display_name", value: "display_name" },
-      { text: "precision", value: "precision" },
-      { text: "unit", value: "unit" },
-      { text: "source_id", value: "source_id" },
-      { text: "scalings", value: "scalings" },
-      { text: "Actions", align: "center", value: "name", sortable: false }
-    ],
-    editedChannelIndex: -1,
-    editedChannel: {
-      ch_id: 0,
-      internal_name: "Slot-",
-      display_name: "Slot-",
-      precision: 2,
-      unit: "",
-      source_id: 0
-    },
-    defaultChannel: {
-      ch_id: 0,
-      internal_name: "Slot-",
-      display_name: "Slot-",
-      precision: 2,
-      unit: "",
-      source_id: 0
-    },
-    scalingDialog: false,
-    editedScaling: [],
-    channelsArray: []
-  }),
+      dialog: false,
+      headers: [
+        {
+          text: "ch_id",
+          value: "name"
+        },
+        { text: "internal_name", value: "internal_name" },
+        { text: "display_name", value: "display_name" },
+        { text: "precision", value: "precision" },
+        { text: "unit", value: "unit" },
+        { text: "source_id", value: "source_id" },
+        { text: "scalings", value: "scalings" },
+        { text: "Actions", align: "center", value: "name", sortable: false }
+      ],
+      editedChannelIndex: -1,
+      editedChannel: {
+        ch_id: 0,
+        internal_name: "Slot-",
+        display_name: "Slot-",
+        precision: 2,
+        unit: "",
+        source_id: 0,
+        scalings: []
+      },
+      defaultChannel: {
+        ch_id: 0,
+        internal_name: "Slot-",
+        display_name: "Slot-",
+        precision: 2,
+        unit: "",
+        source_id: 0,
+        scalings: []
+      },
+      scalingDialog: false,
+      editedScaling: [],
+      channelsArray: []
+    };
+  },
 
   computed: {
     formTitle() {
@@ -142,7 +170,12 @@ export default {
     },
 
     newChannelIndex() {
-      return this.channelsArray.length;
+      return (
+        this.channelsArray.reduce(
+          (max, p) => (p.ch_id > max ? p.ch_id : max),
+          this.channelsArray[0].ch_id
+        ) + 1
+      );
     }
   },
 
@@ -186,8 +219,13 @@ export default {
     },
 
     save() {
+      this.$refs.form.validate();
+
       if (this.editedChannelIndex > -1) {
-        Object.assign(this.channelsArray[this.editedChannelIndex], this.editedChannel);
+        Object.assign(
+          this.channelsArray[this.editedChannelIndex],
+          this.editedChannel
+        );
       } else {
         this.channelsArray.push(this.editedChannel);
       }
