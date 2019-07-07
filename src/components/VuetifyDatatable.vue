@@ -31,6 +31,7 @@
                       v-model="editedChannel.internal_name"
                       label="Internal Name"
                       :rules="[rules.required]"
+                      :readonly="chidReadonly"
                     ></v-text-field>
                   </v-flex>
                   <v-flex xs12 sm6 md4>
