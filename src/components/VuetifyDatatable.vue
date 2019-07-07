@@ -8,53 +8,62 @@
         <template v-slot:activator="{ on }">
           <v-btn color="primary" dark class="mb-2" v-on="on">New Channel</v-btn>
         </template>
-        <v-card ref="form">
+        <v-card>
           <v-card-title>
             <span class="headline">{{ formTitle }}</span>
           </v-card-title>
           <v-card-text>
-            <v-container grid-list-md>
-              <v-layout wrap>
-                <v-flex xs12 sm6 md4>
-                  <v-text-field
-                    v-model="editedChannel.ch_id"
-                    label="ch_id"
-                    :rules="[rules.required]"
-                  ></v-text-field>
-                </v-flex>
-                <v-flex xs12 sm6 md4>
-                  <v-text-field
-                    v-model="editedChannel.internal_name"
-                    label="internal_name"
-                    :rules="[rules.required]"
-                  ></v-text-field>
-                </v-flex>
-                <v-flex xs12 sm6 md4>
-                  <v-text-field
-                    v-model="editedChannel.display_name"
-                    label="display_name"
-                    :rules="[rules.required]"
-                  ></v-text-field>
-                </v-flex>
-                <v-flex xs12 sm6 md4>
-                  <v-text-field
-                    v-model="editedChannel.precision"
-                    label="precision"
-                    :rules="[rules.required, rules.positiveNumber]"
-                  ></v-text-field>
-                </v-flex>
-                <v-flex xs12 sm6 md4>
-                  <v-text-field v-model="editedChannel.unit" label="unit"></v-text-field>
-                </v-flex>
-                <v-flex xs12 sm6 md4>
-                  <v-text-field
-                    v-model="editedChannel.source_id"
-                    label="source_id"
-                    :rules="[rules.required]"
-                  ></v-text-field>
-                </v-flex>
-              </v-layout>
-            </v-container>
+            <v-form ref="form" v-model="valid">
+              <v-container grid-list-md>
+                <v-layout wrap>
+                  <v-flex xs12 sm6 md4>
+                    <v-text-field
+                      v-model="editedChannel.ch_id"
+                      label="Channel Id"
+                      :rules="[rules.required, rules.positiveInteger]"
+                      type="number"
+                      min="0"
+                      :readonly="chidReadonly"
+                    ></v-text-field>
+                  </v-flex>
+                  <v-flex xs12 sm6 md4>
+                    <v-text-field
+                      v-model="editedChannel.internal_name"
+                      label="Internal Name"
+                      :rules="[rules.required]"
+                    ></v-text-field>
+                  </v-flex>
+                  <v-flex xs12 sm6 md4>
+                    <v-text-field
+                      v-model="editedChannel.display_name"
+                      label="Display Name"
+                      :rules="[rules.required]"
+                    ></v-text-field>
+                  </v-flex>
+                  <v-flex xs12 sm6 md4>
+                    <v-text-field
+                      v-model="editedChannel.precision"
+                      label="Precision"
+                      :rules="[rules.required, rules.positiveInteger]"
+                      type="number"
+                      min="0"
+                    ></v-text-field>
+                  </v-flex>
+                  <v-flex xs12 sm6 md4>
+                    <v-text-field v-model="editedChannel.unit" label="Unit"></v-text-field>
+                  </v-flex>
+                  <v-flex xs12 sm6 md4>
+                    <v-text-field
+                      v-model="editedChannel.source_id"
+                      label="Source Id"
+                      :rules="[rules.required, rules.positiveInteger]"
+                      type="number"
+                      min="0"
+                    ></v-text-field>
+                  </v-flex>
+                </v-layout>
+              </v-container>
+            </v-form>
           </v-card-text>
 
           <v-card-actions>
@@ -121,22 +130,23 @@ export default {
   },
   data() {
     return {
+      valid: true,
       rules: {
-        required: value => !!value || "Required.",
-        positiveNumber: value => value > 0 || "Greater than 0"
+        required: value => value===0 || !!value || "Required.",
+        positiveInteger: value => /^\d+$/.test(value) || "Non-negative integer only"
       },
       dialog: false,
       headers: [
         {
-          text: "ch_id",
+          text: "Channel Id",
           value: "name"
         },
-        { text: "internal_name", value: "internal_name" },
-        { text: "display_name", value: "display_name" },
-        { text: "precision", value: "precision" },
-        { text: "unit", value: "unit" },
-        { text: "source_id", value: "source_id" },
-        { text: "scalings", value: "scalings" },
+        { text: "Internal Name", value: "internal_name" },
+        { text: "Display Name", value: "display_name" },
+        { text: "Precision", value: "precision" },
+        { text: "Unit", value: "unit" },
+        { text: "Source Id", value: "source_id" },
+        { text: "Scalings", value: "scalings" },
         { text: "Actions", align: "center", value: "name", sortable: false }
       ],
       editedChannelIndex: -1,
@@ -160,7 +170,8 @@ export default {
       },
       scalingDialog: false,
       editedScaling: [],
-      channelsArray: []
+      channelsArray: [],
+      chidReadonly: false
     };
   },
 
@@ -197,6 +208,7 @@ export default {
     },
 
     editChannel(item) {
+      this.chidReadonly = true;
       this.editedChannelIndex = this.channelsArray.indexOf(item);
       this.editedChannel = Object.assign({}, item);
       this.dialog = true;
@@ -209,6 +221,7 @@ export default {
     },
 
     close() {
+      this.chidReadonly = false;
       this.dialog = false;
       this.defaultChannel.ch_id = this.newChannelIndex;
       this.defaultChannel.source_id = this.newChannelIndex;
@@ -219,17 +232,17 @@ export default {
     },
 
     save() {
-      this.$refs.form.validate();
-
-      if (this.editedChannelIndex > -1) {
-        Object.assign(
-          this.channelsArray[this.editedChannelIndex],
-          this.editedChannel
-        );
-      } else {
-        this.channelsArray.push(this.editedChannel);
+      if (this.$refs.form.validate()) {
+        if (this.editedChannelIndex > -1) {
+          Object.assign(
+            this.channelsArray[this.editedChannelIndex],
+            this.editedChannel
+          );
+        } else {
+          this.channelsArray.push(this.editedChannel);
+        }
+        this.close();
       }
-      this.close();
     },
 
     editScaling(item) {

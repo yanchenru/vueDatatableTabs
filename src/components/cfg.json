@@ -34,7 +34,7 @@
         "source_id": 1,
         "scalings": [
           {
-            "type": "INTERPOLATION",
+            "type": "AVERAGING",
             "avg.samples": 1,
             "itp.raw_low": 0,
             "itp.raw_high": 1,
@@ -46,7 +46,7 @@
             "ttl.samples_per_sec": 0
           },
           {
-            "type": "INTERPOLATION",
+            "type": "TOTALIZING",
             "avg.samples": 11,
             "itp.raw_low": 0,
             "itp.raw_high": 1,
@@ -68,7 +68,7 @@
         "source_id": 2,
         "scalings": [
           {
-            "type": "INTERPOLATION",
+            "type": "KFACTOR",
             "avg.samples": 2,
             "itp.raw_low": 0,
             "itp.raw_high": 1,
