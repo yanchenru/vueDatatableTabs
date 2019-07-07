@@ -1,19 +1,15 @@
 <template>
   <div id="app">
-    <!-- <img alt="Vue logo" src="./assets/logo.png"> -->
-    <!-- <HelloWorld msg="Hello to Your Vue.js App"/> -->
     <VuetifyDatatable/>
   </div>
 </template>
 
 <script>
-// import HelloWorld from './components/HelloWorld.vue'
 import VuetifyDatatable from './components/VuetifyDatatable.vue'
 
 export default {
   name: 'app',
   components: {
-    // HelloWorld,
     VuetifyDatatable
   }
 }
