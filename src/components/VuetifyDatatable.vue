@@ -23,7 +23,7 @@
                       :rules="[rules.required, rules.positiveInteger]"
                       type="number"
                       min="0"
-                      :readonly="chidReadonly"
+                      :readonly="editReadonly"
                     ></v-text-field>
                   </v-flex>
                   <v-flex xs12 sm6 md4>
@@ -31,7 +31,7 @@
                       v-model="editedChannel.internal_name"
                       label="Internal Name"
                       :rules="[rules.required]"
-                      :readonly="chidReadonly"
+                      :readonly="editReadonly"
                     ></v-text-field>
                   </v-flex>
                   <v-flex xs12 sm6 md4>
@@ -172,7 +172,7 @@ export default {
       scalingDialog: false,
       editedScaling: [],
       channelsArray: [],
-      chidReadonly: false
+      editReadonly: false
     };
   },
 
@@ -209,7 +209,7 @@ export default {
     },
 
     editChannel(item) {
-      this.chidReadonly = true;
+      this.editReadonly = true;
       this.editedChannelIndex = this.channelsArray.indexOf(item);
       this.editedChannel = Object.assign({}, item);
       this.dialog = true;
@@ -222,7 +222,7 @@ export default {
     },
 
     close() {
-      this.chidReadonly = false;
+      this.editReadonly = false;
       this.dialog = false;
       this.defaultChannel.ch_id = this.newChannelIndex;
       this.defaultChannel.source_id = this.newChannelIndex;
